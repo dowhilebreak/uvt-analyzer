@@ -1,0 +1,20 @@
+{
+  "name": "uvt-analyzer",
+  "version": "1.0.0",
+  "description": "Unique View Time (UVT) Analyzer for determining video engagement",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./interactive.js",
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "dowhilebreak",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/dowhilebreak/uvt-analyzer.git"
+  },
+  "devDependencies": {
+    "jest": "^24.7.1"
+  }
+}
