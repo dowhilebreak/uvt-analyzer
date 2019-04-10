@@ -1,9 +1,6 @@
 const ViewFragment = require('./ViewFragment');
 const Timestamp = require('./Timestamp');
 
-const friendly_start = '00:22:40.350';
-const friendly_end = '00:22:45.350';
-
 const ts1 = new Timestamp(1360350);
 const ts2 = new Timestamp(1365350);
 
