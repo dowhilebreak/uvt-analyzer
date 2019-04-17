@@ -1,6 +1,6 @@
 {
   "name": "uvt-analyzer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Unique View Time (UVT) Analyzer for determining video engagement",
   "main": "index.js",
   "scripts": {

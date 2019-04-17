@@ -6,8 +6,8 @@ class UserInteraction {
         this._video_id = video_id;
         this._user_id = user_id;
 
-        let start_ts = Timestamp.parse(play_start);
-        let end_ts = Timestamp.parse(play_end);
+        let start_ts = play_start instanceof Timestamp ? play_start : Timestamp.parse(play_start);
+        let end_ts = play_end instanceof Timestamp ? play_end : Timestamp.parse(play_end);
 
         if(start_ts === null || end_ts === null) {
             throw new Error('Playback start and end must be valid timestamps.')

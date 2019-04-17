@@ -48,6 +48,18 @@ test('`runAnalysis`', () => {
     expect(uvta.interactions).toHaveLength(4); /* We didn't accidentally empty the interactions array. */
 });
 
+test('`runAnalysis` with analysis range', () => {
+    let uvta = new UvtAnalyzer(input);
+    uvta.runAnalysis('00:45.0', '01:30.0');
+    expect(uvta._users['unnamed'].videos['1'].uvt.milliseconds).toBe(15758);
+
+    uvta.runAnalysis('00:00.0', '00:15.0');
+    expect(uvta._users['unnamed'].videos['1'].uvt.milliseconds).toBe(4850);
+
+    uvta.runAnalysis('01:00.0', '01:30.0');
+    expect(uvta._users['unnamed'].videos['1'].uvt.milliseconds).toBe(758);
+});
+
 test('`UniqueViewTimeAnalyzer.analyze`', () => {
     let uvta = UvtAnalyzer.analyze(input);
     expect(uvta).toBeInstanceOf(UvtAnalyzer);

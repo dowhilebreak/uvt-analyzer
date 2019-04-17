@@ -1,5 +1,6 @@
 const UserInteraction = require('./UserInteraction');
 const Timestamp = require('./Timestamp');
+const ViewFragment = require('./ViewFragment');
 
 class UniqueViewTimeAnalyzer {
     constructor(input){
@@ -96,15 +97,38 @@ class UniqueViewTimeAnalyzer {
 
     /**
      * Crawls the interactions and produces an object containing the unique view time and unique segments per user/video
+     * @param analysis_start
+     * @param analysis_end
      * @returns {UniqueViewTimeAnalyzer}
      */
-    runAnalysis() {
+    runAnalysis(analysis_start = null, analysis_end = null) {
+        let analysis_period_start = analysis_start !== null ? Timestamp.parse(analysis_start) : null;
+        let analysis_period_end = analysis_end !== null ? Timestamp.parse(analysis_end) : null;
+        let analysis_period = null;
+        if(analysis_period_start && analysis_period_end) {
+            analysis_period = new ViewFragment(null, analysis_period_start, analysis_period_end);
+        }
+
         let queue = Array.from(this.interactions);
         /* TODO: This could undeniably benefit from being de-anonymized. */
         let users = {};
 
         while(queue.length > 0) {
-            let interaction = queue.shift();
+            let unqualified_interaction = queue.shift();
+            let interaction = null;
+            if(analysis_period) {
+                if(analysis_period.overlaps(unqualified_interaction.playback)) {
+                    let common = ViewFragment.getCommonFragment(analysis_period, unqualified_interaction.playback);
+                    interaction = new UserInteraction(unqualified_interaction.videoId, common.start, common.end, unqualified_interaction.userId);
+                } else {
+                    continue; /* The interaction isn't within the desired range so we skip over it. */
+                }
+            } else {
+                interaction = unqualified_interaction;
+            }
+
+            if(!interaction) { continue; }
+
             /* Since we're building the analysis object on the fly we have to check and add any new
              * user and video keys as we crawl the tree. */
             if(typeof users[interaction.userId] === 'undefined') {
@@ -128,7 +152,7 @@ class UniqueViewTimeAnalyzer {
             for (let i = 0; i < video.viewed.length; i++) {
                 let current = video.viewed[i];
 
-                if(interaction.playback.start.gte(current[0]) && interaction.playback.end.lte(current[1])) {
+                if((interaction.playback.start.gte(current[0]) && interaction.playback.end.lte(current[1]))) {
                     /* Already represented by a viewed range */
                     is_merged = true;
                     break;
@@ -169,11 +193,13 @@ class UniqueViewTimeAnalyzer {
     /**
      * Shorthand factory method to create a `UniqueViewTimeAnalyzer` and analyze the input.
      * @param {string} input
+     * @param analysis_range_start
+     * @param analysis_range_end
      * @returns {UniqueViewTimeAnalyzer}
      */
-    static analyze(input){
+    static analyze(input, analysis_range_start = null, analysis_range_end = null){
         let instance = new UniqueViewTimeAnalyzer(input);
-        return instance.runAnalysis();
+        return instance.runAnalysis(analysis_range_start, analysis_range_end);
     }
 }
 

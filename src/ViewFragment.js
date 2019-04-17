@@ -27,31 +27,48 @@ class ViewFragment {
     }
 
     /**
-     * TODO: not currently used
+     * Finds if the passed fragment is entirely contained within the range of the current instance
      * @param fragment
      * @returns {boolean}
      */
     contains(fragment) {
-        if(!(fragment instanceof Fragment)) {
+        if(!(fragment instanceof ViewFragment)) {
             throw new Error('`contains` expects an argument of type `Fragment`.');
         }
         return (this.start.lte(fragment.start) && this.end.gte(fragment.end));
     }
 
     /**
-     * TODO: not currently used
+     * Finds if the passed fragment has a range that overlaps the current instance
      * @param fragment
      * @returns {boolean}
      */
     overlaps(fragment) {
-        if(!(fragment instanceof Fragment)) {
+        if(!(fragment instanceof ViewFragment)) {
             throw new Error('`contains` expects an argument of type `Fragment`.');
         }
 
         return (
             (fragment.start.gte(this.start) && fragment.start.lt(this.end)) ||
-            (fragment.end.lt(this.end) && fragment.end.gt(this.start))
+            (fragment.end.lte(this.end) && fragment.end.gt(this.start))
         );
+    }
+
+    /**
+     * Returns a new ViewFragment containing any time range shared by the arguments;
+     * @param fragment1
+     * @param fragment2
+     * @returns {ViewFragment|null}
+     */
+    static getCommonFragment(fragment1, fragment2) {
+        if(!fragment1.overlaps(fragment2)) {
+            return null;
+        }
+
+        let start = fragment1.start.gte(fragment2.start) ? fragment1.start : fragment2.start;
+        let end = fragment1.end.gte(fragment2.end) ? fragment2.end : fragment1.end;
+
+        return new ViewFragment(fragment1.videoId || fragment2.videoId, start, end);
     }
 
 }

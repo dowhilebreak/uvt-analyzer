@@ -19,7 +19,7 @@ function printHelp() {
     console.log('    help - shows this message');
     console.log('    reset - clears the input fragment buffer');
     console.log('    exit - exit this script');
-    console.log('    run - analyzes the fragments entered');
+    console.log('    run [start end] - analyzes the fragments entered');
     console.log('          and prints the report');
 }
 
@@ -36,11 +36,12 @@ console.log('Enter or paste the list of fragments to analyze:');
 rl.prompt();
 
 rl.on('line', (line) => {
-    switch (line.trim()) {
+    let pieces = line.split(/\s+/);
+    switch (pieces[0].trim()) {
         case 'run':
             try {
                 console.log('-----------------------------------------');
-                UvtAnalyzer.analyze(content.join('\n')).generateReport(true);
+                UvtAnalyzer.analyze(content.join('\n'), pieces[1], pieces[2]).generateReport(true);
                 console.log('-----------------------------------------');
             } catch(err) {
                 console.error(err);
